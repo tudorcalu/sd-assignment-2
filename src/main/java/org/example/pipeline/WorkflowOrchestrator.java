@@ -6,11 +6,13 @@ public class WorkflowOrchestrator {
     private PipelinePhase currentPhase;
     private VideoFile masterFile;
     private IngestService ingestService;
+    private AnalysisService analysisService;
 
     public WorkflowOrchestrator(VideoFile masterFile) {
         this.masterFile = masterFile;
         this.currentPhase = PipelinePhase.START;
         this.ingestService = new IngestService();
+        this.analysisService = new AnalysisService();
     }
 
     public void runPipeline() {
@@ -22,6 +24,10 @@ public class WorkflowOrchestrator {
             System.out.println("Pipeline failed at INGEST phase.");
             return;
         }
+        
+        transitionTo(PipelinePhase.ANALYSIS);
+        analysisService.process(masterFile);
+        
         transitionTo(PipelinePhase.VISUALS);
         transitionTo(PipelinePhase.AUDIO_TEXT);
         transitionTo(PipelinePhase.COMPLIANCE);
