@@ -5,17 +5,23 @@ import org.example.models.VideoFile;
 public class WorkflowOrchestrator {
     private PipelinePhase currentPhase;
     private VideoFile masterFile;
+    private IngestService ingestService;
 
     public WorkflowOrchestrator(VideoFile masterFile) {
         this.masterFile = masterFile;
         this.currentPhase = PipelinePhase.START;
+        this.ingestService = new IngestService();
     }
 
     public void runPipeline() {
         System.out.println("Pipeline starting for: " + masterFile.getFilename());
         
         transitionTo(PipelinePhase.INGEST);
-        transitionTo(PipelinePhase.ANALYSIS);
+        boolean ingestSuccess = ingestService.process(masterFile);
+        if (!ingestSuccess) {
+            System.out.println("Pipeline failed at INGEST phase.");
+            return;
+        }
         transitionTo(PipelinePhase.VISUALS);
         transitionTo(PipelinePhase.AUDIO_TEXT);
         transitionTo(PipelinePhase.COMPLIANCE);
