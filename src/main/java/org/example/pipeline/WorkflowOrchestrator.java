@@ -9,6 +9,7 @@ public class WorkflowOrchestrator {
     private AnalysisService analysisService;
     private VisualsService visualsService;
     private AudioTextService audioTextService;
+    private ComplianceService complianceService;
 
     public WorkflowOrchestrator(VideoFile masterFile) {
         this.masterFile = masterFile;
@@ -17,6 +18,7 @@ public class WorkflowOrchestrator {
         this.analysisService = new AnalysisService();
         this.visualsService = new VisualsService();
         this.audioTextService = new AudioTextService();
+        this.complianceService = new ComplianceService();
     }
 
     public void runPipeline() {
@@ -39,6 +41,8 @@ public class WorkflowOrchestrator {
         audioTextService.process(masterFile);
         
         transitionTo(PipelinePhase.COMPLIANCE);
+        complianceService.process(masterFile);
+        
         transitionTo(PipelinePhase.PACKAGING);
         transitionTo(PipelinePhase.COMPLETE);
 
