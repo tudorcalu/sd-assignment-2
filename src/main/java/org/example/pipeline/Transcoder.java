@@ -17,11 +17,27 @@ public class Transcoder {
         createTestFile(base, "video/hevc/4k_hevc.mkv");
         createTestFile(base, "video/hevc/1080p_hevc.mkv");
         createTestFile(base, "video/hevc/720p_hevc.mkv");
+
+        try {
+            System.out.println("  [->] Calling ffmpeg on host to perform real 720p h264 transcode test...");
+            ProcessBuilder pb = new ProcessBuilder("ffmpeg", "-i", videoFile.getFilename(), "-vf", "scale=-1:720",
+                    "-c:v", "libx264", "-y", base + "/video/h264/720p_h264.mp4");
+            // pb.inheritIO();
+            Process p = pb.start();
+            int exitCode = p.waitFor();
+            System.out.println("OK " + exitCode);
+        } catch (Exception e) {
+            System.err.println("FAIL " + e.getMessage());
+        }
     }
 
     private void createTestFile(String base, String path) {
         File file = new File(base, path);
         file.getParentFile().mkdirs();
-        try { file.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
