@@ -1,4 +1,4 @@
-package org.example.pipeline;
+package org.example.pipeline.compliance;
 
 import org.example.models.VideoFile;
 

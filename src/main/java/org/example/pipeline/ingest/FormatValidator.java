@@ -1,4 +1,4 @@
-package org.example.pipeline;
+package org.example.pipeline.ingest;
 
 import org.example.models.VideoFile;
 

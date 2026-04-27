@@ -1,4 +1,4 @@
-package org.example.pipeline;
+package org.example.pipeline.audiotext;
 
 import org.example.models.VideoFile;
 

@@ -1,4 +1,4 @@
-package org.example.pipeline;
+package org.example.pipeline.analysis;
 
 import org.example.models.VideoFile;
 import java.io.File;

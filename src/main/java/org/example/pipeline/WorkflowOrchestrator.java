@@ -1,6 +1,12 @@
 package org.example.pipeline;
 
 import org.example.models.VideoFile;
+import org.example.pipeline.ingest.IngestService;
+import org.example.pipeline.analysis.AnalysisService;
+import org.example.pipeline.visuals.VisualsService;
+import org.example.pipeline.audiotext.AudioTextService;
+import org.example.pipeline.compliance.ComplianceService;
+import org.example.pipeline.packaging.PackagingService;
 
 public class WorkflowOrchestrator {
     private PipelinePhase currentPhase;
