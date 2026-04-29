@@ -3,8 +3,9 @@ package org.example.pipeline.visuals;
 import org.example.models.VideoFile;
 
 public class VisualsService {
-    private Transcoder transcoder;
-    private SpriteGenerator spriteGenerator;
+
+    private final Transcoder transcoder;
+    private final SpriteGenerator spriteGenerator;
 
     public VisualsService() {
         this.transcoder = new Transcoder();
@@ -13,8 +14,12 @@ public class VisualsService {
 
     public void process(VideoFile videoFile) {
         System.out.println("Starting Visuals Phase");
-        transcoder.transcode(videoFile);
-        spriteGenerator.generateSprites(videoFile);
+        try {
+            transcoder.transcode(videoFile);
+            spriteGenerator.generateSprites(videoFile);
+        } catch (Exception e) {
+            throw new RuntimeException("Visuals phase error: " + e.getMessage(), e);
+        }
         System.out.println("Visuals Phase completed successfully");
     }
 }
