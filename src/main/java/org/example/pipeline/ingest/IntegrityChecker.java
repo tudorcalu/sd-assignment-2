@@ -3,29 +3,39 @@ package org.example.pipeline.ingest;
 import org.example.models.VideoFile;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class IntegrityChecker {
-    public boolean validateChecksum(VideoFile file) {
-        System.out.println("Validating checksum for " + file.getFilename());
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            FileInputStream fis = new FileInputStream(file.getFilename());
-            byte[] byteArray = new byte[8192];
-            int bytesCount;
-            while ((bytesCount = fis.read(byteArray)) != -1) {
-                digest.update(byteArray, 0, bytesCount);
+
+    private static final String HASH_ALGORITHM  = "SHA-256";
+    private static final int    READ_BUFFER_SIZE = 8192;
+    private static final String HEX_FORMAT       = "%02x";
+
+    public boolean validateChecksum(VideoFile file) throws IOException, NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance(HASH_ALGORITHM);
+        try (FileInputStream fis = new FileInputStream(file.getFilename())) {
+            byte[] buffer = new byte[READ_BUFFER_SIZE];
+            int bytesRead;
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                digest.update(buffer, 0, bytesRead);
             }
-            fis.close();
-            byte[] bytes = digest.digest();
-            StringBuilder sb = new StringBuilder();
-            for (byte b : bytes) {
-                sb.append(String.format("%02x", b));
-            }
-            System.out.println("OK " + sb.toString());
-        } catch (Exception e) {
-            System.err.println("FAIL " + e.getMessage());
         }
+        byte[] hashBytes = digest.digest();
+        StringBuilder sb = new StringBuilder();
+        for (byte b : hashBytes) {
+            sb.append(String.format(HEX_FORMAT, b));
+        }
+        String calculated = sb.toString();
+
+        if (file.getExpectedChecksum() != null && !calculated.equals(file.getExpectedChecksum())) {
+            throw new SecurityException(
+                "Checksum mismatch! Expected: " + file.getExpectedChecksum() + ", got: " + calculated
+            );
+        }
+
+        System.out.println("  OK checksum: " + calculated);
         return true;
     }
 }
