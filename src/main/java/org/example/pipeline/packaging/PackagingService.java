@@ -3,9 +3,10 @@ package org.example.pipeline.packaging;
 import org.example.models.VideoFile;
 
 public class PackagingService {
-    private ManifestGenerator manifestGenerator;
-    private DrmEncryptor drmEncryptor;
-    private BundleBuilder bundleBuilder;
+
+    private final ManifestGenerator manifestGenerator;
+    private final DrmEncryptor drmEncryptor;
+    private final BundleBuilder bundleBuilder;
 
     public PackagingService() {
         this.manifestGenerator = new ManifestGenerator();
@@ -14,10 +15,13 @@ public class PackagingService {
     }
 
     public void process(VideoFile videoFile) {
-        System.out.println("Starting Packaging Phase");
-        manifestGenerator.generateManifests(videoFile);
-        drmEncryptor.encrypt(videoFile);
-        bundleBuilder.buildBundle(videoFile);
+        try {
+            manifestGenerator.generateManifests(videoFile);
+            drmEncryptor.encrypt(videoFile);
+            bundleBuilder.buildBundle(videoFile);
+        } catch (Exception e) {
+            throw new RuntimeException("Packaging phase error: " + e.getMessage(), e);
+        }
         System.out.println("Packaging Phase completed successfully");
     }
 }
