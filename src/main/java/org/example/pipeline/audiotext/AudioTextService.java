@@ -3,9 +3,10 @@ package org.example.pipeline.audiotext;
 import org.example.models.VideoFile;
 
 public class AudioTextService {
-    private AudioNormalizer audioNormalizer;
-    private LanguageDetector languageDetector;
-    private SubtitleGenerator subtitleGenerator;
+
+    private final AudioNormalizer audioNormalizer;
+    private final LanguageDetector languageDetector;
+    private final SubtitleGenerator subtitleGenerator;
 
     public AudioTextService() {
         this.audioNormalizer = new AudioNormalizer();
@@ -14,10 +15,13 @@ public class AudioTextService {
     }
 
     public void process(VideoFile videoFile) {
-        System.out.println("Starting Audio/Text Phase");
-        audioNormalizer.normalize(videoFile);
-        languageDetector.detectLanguage(videoFile);
-        subtitleGenerator.generateSubtitles(videoFile);
+        try {
+            audioNormalizer.normalize(videoFile);
+            languageDetector.detectLanguage(videoFile);
+            subtitleGenerator.generateSubtitles(videoFile);
+        } catch (Exception e) {
+            throw new RuntimeException("Audio/Text phase error: " + e.getMessage(), e);
+        }
         System.out.println("Audio/Text Phase completed successfully");
     }
 }

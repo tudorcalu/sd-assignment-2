@@ -2,17 +2,32 @@ package org.example.pipeline.audiotext;
 
 import org.example.models.VideoFile;
 import java.io.File;
-import java.io.IOException;
 
 public class AudioNormalizer {
-    public void normalize(VideoFile videoFile) {
-        System.out.println("Standardizing audio volume to -23 LUFS for " + videoFile.getFilename());
-        createTestFile(videoFile.getOutputDirectory(), "audio/ro_dub_synthetic.aac");
-    }
 
-    private void createTestFile(String base, String path) {
-        File file = new File(base, path);
-        file.getParentFile().mkdirs();
-        try { file.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
+    private static final String LOUDNORM_FILTER = "loudnorm=I=-23:LRA=7:TP=-2";
+    private static final String AUDIO_CODEC     = "aac";
+    private static final String AUDIO_BITRATE   = "192k";
+    private static final String OUTPUT_SUBPATH  = "/audio/ro_dub_synthetic.aac";
+
+    public void normalize(VideoFile videoFile) throws Exception {
+        String output = videoFile.getOutputDirectory() + OUTPUT_SUBPATH;
+        new File(output).getParentFile().mkdirs();
+
+        ProcessBuilder pb = new ProcessBuilder(
+            "ffmpeg",
+            "-i", videoFile.getFilename(),
+            "-af", LOUDNORM_FILTER,
+            "-vn",
+            "-c:a", AUDIO_CODEC,
+            "-b:a", AUDIO_BITRATE,
+            "-y", output
+        );
+        pb.inheritIO();
+        int exit = pb.start().waitFor();
+        if (exit != 0) {
+            throw new RuntimeException("ffmpeg audio normalization failed with exit code " + exit);
+        }
+        System.out.println("  OK normalized audio -> " + output);
     }
 }
