@@ -6,11 +6,10 @@ import java.io.IOException;
 
 public class ComplexityAnalyzer {
     public void analyzeVisualEntropy(VideoFile videoFile) {
-        System.out.println("Running ffprobe on " + videoFile.getFilename());
         try {
             ProcessBuilder pb = new ProcessBuilder("ffprobe", "-v", "error", "-show_format", "-show_streams",
                     videoFile.getFilename());
-            // pb.inheritIO();
+            pb.inheritIO();
             Process process = pb.start();
             int exitCode = process.waitFor();
             System.out.println("OK" + exitCode);

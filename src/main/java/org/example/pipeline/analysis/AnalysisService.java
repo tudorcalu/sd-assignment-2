@@ -3,10 +3,11 @@ package org.example.pipeline.analysis;
 import org.example.models.VideoFile;
 
 public class AnalysisService {
-    private IntroOutroDetector introOutroDetector;
-    private CreditRoller creditRoller;
-    private SceneIndexer sceneIndexer;
-    private ComplexityAnalyzer complexityAnalyzer;
+
+    private final IntroOutroDetector introOutroDetector;
+    private final CreditRoller creditRoller;
+    private final SceneIndexer sceneIndexer;
+    private final ComplexityAnalyzer complexityAnalyzer;
 
     public AnalysisService() {
         this.introOutroDetector = new IntroOutroDetector();
@@ -17,10 +18,14 @@ public class AnalysisService {
 
     public void process(VideoFile videoFile) {
         System.out.println("Starting Analysis Phase");
-        introOutroDetector.detectTheme(videoFile);
-        creditRoller.detectCredits(videoFile);
-        sceneIndexer.indexScenes(videoFile);
-        complexityAnalyzer.analyzeVisualEntropy(videoFile);
+        try {
+            introOutroDetector.detectTheme(videoFile);
+            creditRoller.detectCredits(videoFile);
+            sceneIndexer.indexScenes(videoFile);
+            complexityAnalyzer.analyzeVisualEntropy(videoFile);
+        } catch (Exception e) {
+            throw new RuntimeException("Analysis phase error: " + e.getMessage(), e);
+        }
         System.out.println("Analysis Phase completed successfully.");
     }
 }
