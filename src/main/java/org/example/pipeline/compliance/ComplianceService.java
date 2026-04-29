@@ -3,8 +3,8 @@ package org.example.pipeline.compliance;
 import org.example.models.VideoFile;
 
 public class ComplianceService {
-    private ContentFilter contentFilter;
-    private WatermarkInjector watermarkInjector;
+    private final ContentFilter contentFilter;
+    private final WatermarkInjector watermarkInjector;
 
     public ComplianceService() {
         this.contentFilter = new ContentFilter();
@@ -13,8 +13,12 @@ public class ComplianceService {
 
     public void process(VideoFile videoFile) {
         System.out.println("Starting Compliance Phase");
-        contentFilter.filterContent(videoFile);
-        watermarkInjector.injectWatermark(videoFile);
+        try {
+            contentFilter.filterContent(videoFile);
+            watermarkInjector.injectWatermark(videoFile);
+        } catch (Exception e) {
+            throw new RuntimeException("Compliance phase error: " + e.getMessage(), e);
+        }
         System.out.println("Compliance Phase completed successfully");
     }
 }
